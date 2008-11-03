@@ -25,6 +25,19 @@ class Job < ActiveRecord::Base
     
     job
   end
+  
+  def self.enqueue_with_delay!(delay_in_minutes, worker_class, worker_method, *args)
+    job = create!(
+      :start_at      => Time.now + (delay_in_minutes * 60),
+      :worker_class  => worker_class.to_s,
+      :worker_method => worker_method.to_s,
+      :args          => args
+    )
+    
+    logger.info("BackgroundFu: Job enqueued with #{delay_in_minutes} minute delay. Job(id: #{job.id}, worker: #{worker_class}, method: #{worker_method}, argc: #{args.size}).")
+    
+    job
+  end
 
   # Invoked by a background daemon.
   def get_done!
