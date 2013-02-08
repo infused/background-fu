@@ -83,7 +83,7 @@ class Job < ActiveRecord::Base
   def ensure_worker
     self.progress = @worker.instance_variable_get("@progress")
     save!
-  rescue StaleObjectError
+  rescue ActiveRecord::StaleObjectError
     # Ignore this exception as its only purpose is
     # not allowing multiple daemons execute the same job.
     logger.info("BackgroundFu: Race condition handled (It's OK). Job(id: #{id}).")
